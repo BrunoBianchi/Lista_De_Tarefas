@@ -1,3 +1,3 @@
-# My Portifolio 
-## Create with Svelte and TypeScript
+# To do list created by Bruno Bianchi
+## Created with Svelte.js and TypeScript
 
