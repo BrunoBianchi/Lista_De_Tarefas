@@ -4,6 +4,8 @@
     export let id:number
     export let deleteFunc:Function
     export let editFunc:Function
+    export let checked:boolean
+    export let doneTarefa:Function
     function expand(id:number) {
         let icon =  document.getElementById(`expand_${id}`) as HTMLInputElement;
         if(icon.className == "fa-solid fa-caret-down") {
@@ -24,13 +26,14 @@
    </script>
 
 
-
+{#if checked == true}
 <li  class="list-group-item">
-    <i on:click={deleteFunc(id)} id="tarefa_delete" style="z-index:1;float:left;margin-top:4px;margin-right:10px;" class="fa-solid fa-trash-can"></i>
+    <input id="checkbox-{id}" on:change={doneTarefa(id)}  style="float:left;margin-top:5px;height:15px;width:15px;margin-right:5px;" type="checkbox" {checked}/>
+    <i on:click={deleteFunc(id)} id="tarefa_delete" style="float:left;margin-top:4px;margin-right:10px;" class="fa-solid fa-trash-can"></i>
     <div on:click={expand(id)} style="width:100%" data-bs-toggle="collapse" href="#tarefaCollapse-{id}" class="tarefa-{id} pointer"  >
          <a href="#{id}"  role="button" aria-expanded="false" aria-controls="collapseExample">
-        <span >{name}</span> 
-        <i style="float:right" id="expand_{id}"   class="fa-solid fa-caret-right"></i>
+        <span style="text-decoration: line-through;" id="Tarefa-name-{id}" >{name}</span> 
+        <i style="float:right;margin-top:3px;font-size:17px" id="expand_{id}"  class="fa-solid fa-caret-right"></i>
     </a>
 </div>
    
@@ -44,6 +47,30 @@
        
       </div>
 </li>
+{:else if checked == false}
+<li  class="list-group-item">
+    <input id="checkbox-{id}" on:change={doneTarefa(id)}  style="float:left;margin-top:5px;height:15px;width:15px;margin-right:5px;" type="checkbox"/>
+    <i on:click={deleteFunc(id)} id="tarefa_delete" style="float:left;margin-top:4px;margin-right:10px;" class="fa-solid fa-trash-can"></i>
+    <div on:click={expand(id)} style="width:100%" data-bs-toggle="collapse" href="#tarefaCollapse-{id}" class="tarefa-{id} pointer"  >
+         <a href="#{id}"  role="button" aria-expanded="false" aria-controls="collapseExample">
+        <span id="Tarefa-name-{id}" >{name}</span> 
+        <i style="float:right;margin-top:3px;font-size:17px" id="expand_{id}"   class="fa-solid fa-caret-right"></i>
+    </a>
+</div>
+   
+    <div class="tarefas_card_body" ></div>
+    <div class="collapse" id="tarefaCollapse-{id}">
+        <div class="tarefas_card">
+         <p id="tarefa_description-{id}"><span>{description}</span><i on:click={editarTarefa(id)} id="tarefa_edit" style="float:right;margin-top:5px" class="fa-solid fa-pencil"></i></p>
+         <textarea id="textArea-{id}" style="width:100%;height:100%;display:none">{description}</textarea>
+         <a on:click={editFunc(id)} style="display:none;" id="editbtn-{id}" class="editbtn" >Atualizar</a>
+        </div>
+       
+      </div>
+</li>
+{/if}
+
+
 
 <style>
 .list-group-item {

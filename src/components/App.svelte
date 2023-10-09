@@ -1,14 +1,15 @@
 
  <script lang="ts">
-  import { text } from "svelte/internal";
 	import Lista from "./lista.svelte";
 	interface listaProps {
 		name:string;
 		readonly id:number;
 		description:string;
 		readonly date:Date;
+		checked:boolean;
 	}
-	export let tarefas:listaProps[] = JSON.parse(localStorage.getItem("@listagem_tarefas"));
+	export let tarefas:listaProps[] = JSON.parse(localStorage.getItem("@listagem_tarefas")).sort((a,b)=>{return( a.checked - b.checked )});
+
 	if(!tarefas) {
 		tarefas = [];
 	}
@@ -21,10 +22,11 @@
 			description:description.value,
 			id:Math.floor(Math.random() * 5000),
 			date:new Date(),
+			checked:false,
 		}
 		tarefas.push(data);
 		localStorage.setItem("@listagem_tarefas", JSON.stringify(tarefas));
-		tarefas = tarefas;
+		tarefas =  JSON.parse(localStorage.getItem("@listagem_tarefas")).sort((a,b)=>{return( a.checked - b.checked )});;
 	}
 	function deleteTarefa(id:number) {
 		let index = tarefas.indexOf(tarefas.find(function(tarefa){return tarefa.id == id}));
@@ -44,21 +46,33 @@
 		tarefas = tarefas;
 		localStorage.setItem("@listagem_tarefas", JSON.stringify(tarefas));
 	}
+	function doneTarefa(id:number) {
+		let tarefa = tarefas.find(function(tarefa){return tarefa.id ==id});
+		let inputbox = document.getElementById(`checkbox-${id}`) as HTMLInputElement;
+		tarefa.checked = inputbox.checked;
+		let name_html = document.getElementById(`Tarefa-name-${id}`) as HTMLInputElement;
+		if(tarefa.checked == true) {
+			name_html.style.textDecoration= "line-through";
+		}else {
+			name_html.style.textDecoration= "none";
+		}
+		localStorage.setItem("@listagem_tarefas", JSON.stringify(tarefas));
+		tarefas =  JSON.parse(localStorage.getItem("@listagem_tarefas")).sort((a,b)=>{return( a.checked - b.checked )});
+	}
    </script>
 	
 <main>
 <div class="container justify-content-center">
-	<h1 style="text-align:center">Lista De Tarefas</h1>
+	<h1 style="text-align:center;">Lista De Tarefas</h1>
 	<div class="container justify-content-center" style="width:50%;margin-top:40px">
 		<div class="input-group mb-3">
 			<input id="name" type="text" class="form-control" placeholder="Nome da tarefa" aria-label="Recipient's username" aria-describedby="button-addon2">
 			<input id="description" type="text" class="form-control" placeholder="Descrição da tarefa" aria-label="Recipient's username" aria-describedby="button-addon2">
-
 			<button on:click={adicionarTarefa} class="btn btn-outline-secondary" type="button" id="button-addon2">Adicionar</button>
 		  </div>
 		<ul class="list-group">
 			{#each tarefas as tarefa}
-				<Lista editFunc={editarTarefa} deleteFunc={deleteTarefa} id="{tarefa.id}" name="{tarefa.name}" description="{tarefa.description}"> </Lista>
+				<Lista doneTarefa={doneTarefa} checked={tarefa.checked} editFunc={editarTarefa} deleteFunc={deleteTarefa} id="{tarefa.id}" name="{tarefa.name}" description="{tarefa.description}"> </Lista>
 			{/each}
 			
 		  </ul>
